@@ -236,11 +236,11 @@ export async function flushDirtyCollectionRarity(store: Store): Promise<void> {
   }
 
   const collectionIds = Array.from(dirtyCollectionIds)
-  dirtyCollectionIds.clear()
 
   for (const collectionId of collectionIds) {
     try {
       await updateCollectionRarity(store, collectionId)
+      dirtyCollectionIds.delete(collectionId)
     } catch (error) {
       logger.error(
         `[RARITY] Failed to update collection ${collectionId}: ${(error as Error).message}`,

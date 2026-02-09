@@ -14,9 +14,11 @@ module.exports = class Data1760160000000 {
         await db.query(`CREATE INDEX "IDX_nft_entity_collection_rarity_rank" ON "nft_entity" ("collection_id", "rarity_rank") `)
         await db.query(`CREATE INDEX "IDX_nft_entity_collection_rarity_tier" ON "nft_entity" ("collection_id", "rarity_tier") `)
         await db.query(`CREATE INDEX "IDX_nft_entity_collection_rarity_percentile" ON "nft_entity" ("collection_id", "rarity_percentile") `)
+        await db.query(`CREATE INDEX "IDX_nft_entity_collection_rarity_score" ON "nft_entity" ("collection_id", "rarity_score") `)
     }
 
     async down(db) {
+        await db.query(`DROP INDEX "public"."IDX_nft_entity_collection_rarity_score"`)
         await db.query(`DROP INDEX "public"."IDX_nft_entity_collection_rarity_percentile"`)
         await db.query(`DROP INDEX "public"."IDX_nft_entity_collection_rarity_tier"`)
         await db.query(`DROP INDEX "public"."IDX_nft_entity_collection_rarity_rank"`)

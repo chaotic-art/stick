@@ -1,5 +1,6 @@
 import { emOf } from '@kodadot1/metasquid/entity'
 import { logger } from '@kodadot1/metasquid/logger'
+import { RARITY_BACKFILL_ENABLED, RARITY_BACKFILL_PER_BATCH } from '../../environment'
 import { Store } from './types'
 
 const dirtyCollectionIds = new Set<string>()
@@ -23,6 +24,10 @@ type CollectionTokenRow = {
   id: string
   sn: string | number | bigint
   attributes?: AttributeRow[] | null
+}
+
+type CollectionIdRow = {
+  id: string
 }
 
 type RankedToken = {
@@ -239,6 +244,46 @@ export async function flushDirtyCollectionRarity(store: Store): Promise<void> {
     } catch (error) {
       logger.error(
         `[RARITY] Failed to update collection ${collectionId}: ${(error as Error).message}`,
+      )
+      throw error
+    }
+  }
+}
+
+async function fetchCollectionsMissingRarity(store: Store): Promise<string[]> {
+  const rows = await emOf(store).query(
+    `
+      SELECT DISTINCT collection_id AS id
+      FROM nft_entity
+      WHERE burned = false
+        AND collection_id IS NOT NULL
+        AND rarity_tier IS NULL
+      ORDER BY collection_id
+      LIMIT $1
+    `,
+    [RARITY_BACKFILL_PER_BATCH],
+  ) as CollectionIdRow[]
+
+  return rows.map(({ id }) => String(id))
+}
+
+export async function flushMissingCollectionRarity(store: Store): Promise<void> {
+  if (!RARITY_BACKFILL_ENABLED || RARITY_BACKFILL_PER_BATCH <= 0) {
+    return
+  }
+
+  const collectionIds = await fetchCollectionsMissingRarity(store)
+  if (!collectionIds.length) {
+    return
+  }
+
+  logger.info(`[RARITY] Backfilling ${collectionIds.length} collections`)
+  for (const collectionId of collectionIds) {
+    try {
+      await updateCollectionRarity(store, collectionId)
+    } catch (error) {
+      logger.error(
+        `[RARITY] Failed to backfill collection ${collectionId}: ${(error as Error).message}`,
       )
       throw error
     }

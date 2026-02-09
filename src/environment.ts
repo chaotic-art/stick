@@ -8,6 +8,9 @@ const UNIQUE_STARTING_BLOCK = 323_750 // 618838;
 const NFT_STARTING_BLOCK = 4_556_552
 export const STARTING_BLOCK = UNIQUES_ENABLED ? UNIQUE_STARTING_BLOCK : NFT_STARTING_BLOCK
 
+export const RARITY_BACKFILL_ENABLED = process.env.RARITY_BACKFILL_ENABLED !== 'false'
+export const RARITY_BACKFILL_PER_BATCH = Number.parseInt(process.env.RARITY_BACKFILL_PER_BATCH || '10', 10)
+
 // Asset Hub
 const ARCHIVE_URL = `https://v2.archive.subsquid.io/network/asset-hub-${CHAIN}`
 const NODE_URL = `wss://${CHAIN}-asset-hub-rpc.polkadot.io`
@@ -18,6 +21,8 @@ console.table({
   CHAIN, ARCHIVE_URL, NODE_URL, STARTING_BLOCK,
   COLLECTION_OFFER,
   UNIQUES_ENABLED,
+  RARITY_BACKFILL_ENABLED,
+  RARITY_BACKFILL_PER_BATCH,
   disabledRPC: false,
   environment: isProd ? 'production' : 'development',
 })

@@ -10,7 +10,7 @@ import * as u from './uniques'
 import { BatchContext, Block, Context, SelectedEvent } from './utils/types'
 import { ParachainSystemCall } from '../processable'
 import { updateSwapsCache } from './utils/cache'
-import { flushDirtyCollectionRarity } from './utils/rarity'
+import { flushDirtyCollectionRarity, flushMissingCollectionRarity } from './utils/rarity'
 
 type HandlerFunction = <T extends SelectedEvent>(item: T, ctx: Context) => Promise<void>
 
@@ -251,6 +251,8 @@ export async function mainFrame(ctx: BatchContext<Store>): Promise<void> {
 
     await flushDirtyCollectionRarity(ctx.store)
   }
+
+  await flushMissingCollectionRarity(ctx.store)
 
   if (ctx.isHead) {
     const lastBlock = ctx.blocks[ctx.blocks.length - 1]

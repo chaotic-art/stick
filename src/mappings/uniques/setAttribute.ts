@@ -38,5 +38,8 @@ export async function handleAttributeSet(context: Context): Promise<void> {
   }
 
   await context.store.save(final)
-  markCollectionRarityDirty(event.collectionId)
+  // Collection-level attributes do not affect NFT rarity; only item attributes should trigger recompute.
+  if (event.sn !== undefined) {
+    markCollectionRarityDirty(event.collectionId)
+  }
 }

@@ -8,8 +8,21 @@ const UNIQUE_STARTING_BLOCK = 323_750 // 618838;
 const NFT_STARTING_BLOCK = 4_556_552
 export const STARTING_BLOCK = UNIQUES_ENABLED ? UNIQUE_STARTING_BLOCK : NFT_STARTING_BLOCK
 
+function asNonNegativeInteger(value: string | undefined, fallback: number): number {
+  if (value === undefined) {
+    return fallback
+  }
+
+  const parsed = Number.parseInt(value, 10)
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return fallback
+  }
+
+  return parsed
+}
+
 export const RARITY_BACKFILL_ENABLED = process.env.RARITY_BACKFILL_ENABLED !== 'false'
-export const RARITY_BACKFILL_PER_BATCH = Number.parseInt(process.env.RARITY_BACKFILL_PER_BATCH || '10', 10)
+export const RARITY_BACKFILL_PER_BATCH = asNonNegativeInteger(process.env.RARITY_BACKFILL_PER_BATCH, 10)
 
 // Asset Hub
 const ARCHIVE_URL = `https://v2.archive.subsquid.io/network/asset-hub-${CHAIN}`

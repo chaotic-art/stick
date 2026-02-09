@@ -248,10 +248,9 @@ export async function mainFrame(ctx: BatchContext<Store>): Promise<void> {
       })
       // const item = event
     }
-
-    await flushDirtyCollectionRarity(ctx.store)
   }
 
+  await flushDirtyCollectionRarity(ctx.store)
   await flushMissingCollectionRarity(ctx.store)
 
   if (ctx.isHead) {

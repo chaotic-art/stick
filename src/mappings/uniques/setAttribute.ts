@@ -5,6 +5,7 @@ import { unHex } from '../utils/helper'
 import { Context } from '../utils/types'
 import { getAttributeEvent } from './getters'
 import { attributeFrom, tokenIdOf } from './types'
+import { markCollectionRarityDirty } from '../utils/rarity'
 
 /**
  * Handle the attribute set event (Uniques.AttributeSet, Uniques.AttributeCleared)
@@ -37,4 +38,8 @@ export async function handleAttributeSet(context: Context): Promise<void> {
   }
 
   await context.store.save(final)
+  // Collection-level attributes do not affect NFT rarity; only item attributes should trigger recompute.
+  if (event.sn !== undefined) {
+    markCollectionRarityDirty(event.collectionId)
+  }
 }

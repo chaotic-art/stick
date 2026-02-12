@@ -5,6 +5,7 @@ import { Context, isNFT } from '../utils/types'
 import { addressOf, isAddress, unHex } from '../utils/helper'
 import { getAttributeEvent } from './getters'
 import { attributeFrom, tokenIdOf } from './types'
+import { markCollectionRarityDirty } from '../utils/rarity'
 
 /**
  * Handle the attribute set event (Nfts.AttributeSet, Nfts.AttributeCleared)
@@ -58,4 +59,7 @@ export async function handleAttributeSet(context: Context): Promise<void> {
   }
 
   await context.store.save(final)
+  if (isNFT(event)) {
+    markCollectionRarityDirty(event.collectionId)
+  }
 }

@@ -59,5 +59,7 @@ export async function handleAttributeSet(context: Context): Promise<void> {
   }
 
   await context.store.save(final)
-  markCollectionRarityDirty(event.collectionId)
+  if (isNFT(event)) {
+    markCollectionRarityDirty(event.collectionId)
+  }
 }

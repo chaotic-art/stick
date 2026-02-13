@@ -236,6 +236,7 @@ export async function flushDirtyCollectionRarity(store: Store): Promise<void> {
   }
 
   const collectionIds = Array.from(dirtyCollectionIds)
+  logger.info(`[RARITY] Flushing ${collectionIds.length} dirty collections`)
 
   for (const collectionId of collectionIds) {
     try {

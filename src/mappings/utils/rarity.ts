@@ -181,12 +181,17 @@ export function markCollectionRarityDirty(collectionId: string | null | undefine
 }
 
 async function updateCollectionRarity(store: Store, collectionId: string): Promise<void> {
+  // Build rarity traits from item attributes, then fallback to metadata attributes.
   const rows = await emOf(store).query(
     `
-      SELECT id, sn, attributes
-      FROM nft_entity
-      WHERE collection_id = $1
-        AND burned = false
+      SELECT ne.id,
+             ne.sn,
+             COALESCE(NULLIF(ne.attributes, '[]'::jsonb), me.attributes) AS attributes
+      FROM nft_entity AS ne
+      LEFT JOIN metadata_entity AS me
+        ON me.id = ne.meta_id
+      WHERE ne.collection_id = $1
+        AND ne.burned = false
     `,
     [collectionId],
   ) as CollectionTokenRow[]

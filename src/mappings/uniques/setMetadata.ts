@@ -9,6 +9,7 @@ import { updateItemMetadataByCollection } from '../utils/cache'
 import { setMetadataHandler } from '../shared/token'
 import { tokenIdOf } from './types'
 import { getMetadataEvent } from './getters'
+import { markCollectionRarityDirty } from '../utils/rarity'
 
 const OPERATION = 'METADATA' as any
 
@@ -53,6 +54,8 @@ export async function handleMetadataSet(context: Context): Promise<void> {
     await context.store.save(final)
 
     if (eventIsOnNFT) {
+      markCollectionRarityDirty(event.collectionId)
+
       const collection = await getOptional<CollectionEntity>(context.store, CollectionEntity, event.collectionId)
 
       if (!collection) {

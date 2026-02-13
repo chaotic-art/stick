@@ -17,6 +17,7 @@ deploy:
       CHAIN: polkadot
       OFFER: 174
       UNIQUES_ENABLED: true
+      RARITY_BACKFILL_ENABLED: true
   api:
     cmd:
       - npx

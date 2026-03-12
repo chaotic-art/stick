@@ -24,7 +24,7 @@ export async function handleMetadataSet(context: Context): Promise<void> {
   debug(OPERATION, event)
 
   if (!event.metadata) {
-    // TODO: Handle NFT metadata clear in a separate bugfix PR without regressing token unlinking.
+    // TODO: Handle NFT metadata clear in a separate PR.
     return
   }
 

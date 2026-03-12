@@ -1,6 +1,7 @@
 import { emOf } from '@kodadot1/metasquid/entity'
 import { logger } from '@kodadot1/metasquid/logger'
 import { RARITY_BACKFILL_ENABLED, RARITY_BACKFILL_PER_BATCH } from '../../environment'
+import { normalizeAttributePair } from './nftAttributes'
 import { Store } from './types'
 
 const dirtyCollectionIds = new Set<string>()
@@ -56,14 +57,12 @@ function asSn(sn: string | number | bigint): bigint {
 }
 
 function attributeKey(attribute: AttributeRow): string | null {
-  const trait = attribute.trait?.trim()
-  const value = attribute.value?.trim()
-
-  if (!trait || !value) {
+  const normalized = normalizeAttributePair(attribute)
+  if (!normalized) {
     return null
   }
 
-  return `${trait}::${value}`
+  return `${normalized.key}::${normalized.value}`
 }
 
 export function rarityTierFromPercentile(percentile: number): RarityTier {

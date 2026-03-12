@@ -79,4 +79,16 @@ describe('Rarity', () => {
     expect(traitless).toHaveLength(2)
     expect(traitless.every(row => row.rarityTier === 'COMMON')).toBe(true)
   })
+
+  it('normalizes trait casing and whitespace before scoring', () => {
+    const rows = calculateCollectionRarity([
+      { id: '5-1', sn: 1, attributes: [{ trait: ' Background ', value: 'Blue  Sky' }] },
+      { id: '5-2', sn: 2, attributes: [{ trait: 'background', value: ' blue   sky ' }] },
+      { id: '5-3', sn: 3, attributes: [{ trait: 'background', value: 'green' }] },
+    ])
+
+    expect(rows.find(row => row.id === '5-1')?.rarityScore).toBe(1.5)
+    expect(rows.find(row => row.id === '5-2')?.rarityScore).toBe(1.5)
+    expect(rows.find(row => row.id === '5-3')?.rarityScore).toBe(3)
+  })
 })

@@ -4,6 +4,7 @@ import {Attribute} from "./_attribute"
 import {CollectionEntity} from "./collectionEntity.model"
 import {Event} from "./event.model"
 import {MetadataEntity} from "./metadataEntity.model"
+import {NftAttributeEntity} from "./nftAttributeEntity.model"
 import {TokenEntity} from "./tokenEntity.model"
 
 @Entity_()
@@ -96,6 +97,9 @@ export class NFTEntity {
     @Index_()
     @StringColumn_({nullable: true})
     rarityTier!: string | undefined | null
+
+    @OneToMany_(() => NftAttributeEntity, e => e.nft)
+    normalizedAttributes!: NftAttributeEntity[]
 
     @Index_()
     @DateTimeColumn_({nullable: false})

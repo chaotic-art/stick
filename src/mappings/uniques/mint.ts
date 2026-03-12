@@ -11,6 +11,7 @@ import { versionOf, calculateCollectionOwnerCountAndDistribution } from '../util
 import { mintHandler } from '../shared/token'
 import { getCreateTokenEvent } from './getters'
 import { markCollectionRarityDirty } from '../utils/rarity'
+import { markNftAttributesDirty } from '../utils/nftAttributes'
 
 const OPERATION = Action.MINT
 
@@ -78,6 +79,7 @@ export async function handleTokenCreate(context: Context): Promise<void> {
   await context.store.save(final)
   await context.store.save(collection)
   markCollectionRarityDirty(collection.id)
+  markNftAttributesDirty(final.id)
   await createEvent(
     final,
     OPERATION,

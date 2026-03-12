@@ -84,10 +84,21 @@ type NFTEntity @entity {
   rarityRank: Int @index
   rarityPercentile: Float @index
   rarityTier: String @index
+  normalizedAttributes: [NftAttributeEntity!]! @derivedFrom(field: "nft")
   # swap: Swap @derivedFrom(field: "nft")
   updatedAt: DateTime! @index
   version: Int!
   token: TokenEntity
+}
+
+# Entity to store a normalized key/value attribute for an NFT
+# used for indexed trait lookups, filtering, and rarity calculations
+# each row belongs to a single NFTEntity via the nft relation
+type NftAttributeEntity @entity {
+  id: ID!
+  nft: NFTEntity!
+  key: String! @index
+  value: String! @index
 }
 
 # Entity to represent a Metadata

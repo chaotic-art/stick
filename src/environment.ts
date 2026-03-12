@@ -23,6 +23,8 @@ function asNonNegativeInteger(value: string | undefined, fallback: number): numb
 
 export const RARITY_BACKFILL_ENABLED = process.env.RARITY_BACKFILL_ENABLED !== 'false'
 export const RARITY_BACKFILL_PER_BATCH = asNonNegativeInteger(process.env.RARITY_BACKFILL_PER_BATCH, 10)
+export const NFT_ATTRIBUTE_BACKFILL_ENABLED = process.env.NFT_ATTRIBUTE_BACKFILL_ENABLED !== 'false'
+export const NFT_ATTRIBUTE_BACKFILL_PER_BATCH = asNonNegativeInteger(process.env.NFT_ATTRIBUTE_BACKFILL_PER_BATCH, 100)
 
 // Asset Hub
 const ARCHIVE_URL = `https://v2.archive.subsquid.io/network/asset-hub-${CHAIN}`
@@ -36,6 +38,8 @@ console.table({
   UNIQUES_ENABLED,
   RARITY_BACKFILL_ENABLED,
   RARITY_BACKFILL_PER_BATCH,
+  NFT_ATTRIBUTE_BACKFILL_ENABLED,
+  NFT_ATTRIBUTE_BACKFILL_PER_BATCH,
   disabledRPC: false,
   environment: isProd ? 'production' : 'development',
 })

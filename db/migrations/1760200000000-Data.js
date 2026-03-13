@@ -2,11 +2,11 @@ module.exports = class Data1760200000000 {
     name = 'Data1760200000000'
 
     async up(db) {
-        await db.query(`CREATE TABLE "nft_attribute_entity" ("id" character varying NOT NULL, "key" text NOT NULL, "value" text NOT NULL, "nft_id" character varying, CONSTRAINT "PK_b0c8f0c8bc6717ef1cb790b46eb" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "nft_attribute_entity" ("id" character varying NOT NULL, "key" text NOT NULL, "value" text NOT NULL, "nft_id" character varying NOT NULL, CONSTRAINT "PK_b0c8f0c8bc6717ef1cb790b46eb" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_nft_attribute_entity_nft_id" ON "nft_attribute_entity" ("nft_id") `)
         await db.query(`CREATE INDEX "IDX_nft_attribute_entity_key" ON "nft_attribute_entity" ("key") `)
         await db.query(`CREATE INDEX "IDX_nft_attribute_entity_value_hash" ON "nft_attribute_entity" USING hash ("value") `)
-        await db.query(`ALTER TABLE "nft_attribute_entity" ADD CONSTRAINT "FK_nft_attribute_entity_nft" FOREIGN KEY ("nft_id") REFERENCES "nft_entity"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "nft_attribute_entity" ADD CONSTRAINT "FK_nft_attribute_entity_nft" FOREIGN KEY ("nft_id") REFERENCES "nft_entity"("id") ON DELETE CASCADE ON UPDATE NO ACTION`)
     }
 
     async down(db) {

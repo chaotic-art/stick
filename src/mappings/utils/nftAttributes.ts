@@ -176,7 +176,11 @@ async function fetchNftsMissingAttributes(store: Store): Promise<string[]> {
     `
       WITH effective AS (
         SELECT ne.id,
-               COALESCE(NULLIF(ne.attributes, '[]'::jsonb), me.attributes, '[]'::jsonb) AS attributes
+               CASE
+                 WHEN jsonb_typeof(ne.attributes) = 'array' AND ne.attributes <> '[]'::jsonb THEN ne.attributes
+                 WHEN jsonb_typeof(me.attributes) = 'array' THEN me.attributes
+                 ELSE '[]'::jsonb
+               END AS attributes
         FROM nft_entity AS ne
         LEFT JOIN metadata_entity AS me
           ON me.id = ne.meta_id

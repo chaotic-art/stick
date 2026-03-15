@@ -72,7 +72,7 @@ export function buildNormalizedAttributes(nftId: string, attributes?: AttributeL
       continue
     }
 
-    const dedupeKey = `${normalized.key}::${normalized.value}`
+    const dedupeKey = JSON.stringify([normalized.key, normalized.value])
     if (deduped.has(dedupeKey)) {
       continue
     }

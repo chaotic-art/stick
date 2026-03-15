@@ -27,6 +27,16 @@ describe('NFT attribute normalization', () => {
     expect(rows.map(row => `${row.key}:${row.value}`)).toEqual(['background:blue', 'hat:cap'])
   })
 
+  it('does not collapse distinct pairs that would collide with a :: join key', () => {
+    const rows = buildNormalizedAttributes('1-4', [
+      { trait: 'a', value: 'b::c' },
+      { trait: 'a::b', value: 'c' },
+    ])
+
+    expect(rows).toHaveLength(2)
+    expect(rows.map(row => `${row.key}:${row.value}`)).toEqual(['a:b::c', 'a::b:c'])
+  })
+
   it('uses item attributes before metadata fallback', () => {
     const itemAttributes = [{ trait: 'Hat', value: 'Cap' }]
     const metadataAttributes = [{ trait: 'Background', value: 'Blue' }]

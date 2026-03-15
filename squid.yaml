@@ -18,6 +18,7 @@ deploy:
       OFFER: 464
       UNIQUES_ENABLED: true
       RARITY_BACKFILL_ENABLED: true
+      NFT_ATTRIBUTE_BACKFILL_ENABLED: true
   api:
     cmd:
       - npx

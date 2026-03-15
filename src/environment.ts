@@ -21,9 +21,9 @@ function asNonNegativeInteger(value: string | undefined, fallback: number): numb
   return parsed
 }
 
-export const RARITY_BACKFILL_ENABLED = process.env.RARITY_BACKFILL_ENABLED !== 'false'
+export const RARITY_BACKFILL_ENABLED = process.env.RARITY_BACKFILL_ENABLED === 'true'
 export const RARITY_BACKFILL_PER_BATCH = asNonNegativeInteger(process.env.RARITY_BACKFILL_PER_BATCH, 10)
-export const NFT_ATTRIBUTE_BACKFILL_ENABLED = process.env.NFT_ATTRIBUTE_BACKFILL_ENABLED !== 'false'
+export const NFT_ATTRIBUTE_BACKFILL_ENABLED = process.env.NFT_ATTRIBUTE_BACKFILL_ENABLED === 'true'
 export const NFT_ATTRIBUTE_BACKFILL_PER_BATCH = asNonNegativeInteger(process.env.NFT_ATTRIBUTE_BACKFILL_PER_BATCH, 100)
 
 // Asset Hub

@@ -91,4 +91,31 @@ describe('Rarity', () => {
     expect(rows.find(row => row.id === '5-2')?.rarityScore).toBe(1.5)
     expect(rows.find(row => row.id === '5-3')?.rarityScore).toBe(3)
   })
+
+  it('deduplicates normalized traits per nft before counting and scoring', () => {
+    const rows = calculateCollectionRarity([
+      {
+        id: '6-1',
+        sn: 1,
+        attributes: [
+          { trait: 'Background', value: 'Blue' },
+          { trait: ' background ', value: ' blue ' },
+        ],
+      },
+      {
+        id: '6-2',
+        sn: 2,
+        attributes: [{ trait: 'Background', value: 'Blue' }],
+      },
+      {
+        id: '6-3',
+        sn: 3,
+        attributes: [{ trait: 'Background', value: 'Green' }],
+      },
+    ])
+
+    expect(rows.find(row => row.id === '6-1')?.rarityScore).toBe(1.5)
+    expect(rows.find(row => row.id === '6-2')?.rarityScore).toBe(1.5)
+    expect(rows.find(row => row.id === '6-3')?.rarityScore).toBe(3)
+  })
 })

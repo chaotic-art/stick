@@ -65,6 +65,14 @@ function attributeKey(attribute: AttributeRow): string | null {
   return `${normalized.key}::${normalized.value}`
 }
 
+function normalizedTraitKeys(attributes?: AttributeRow[] | null): string[] {
+  return Array.from(new Set(
+    (attributes || [])
+      .map(attributeKey)
+      .filter((key): key is string => key !== null),
+  ))
+}
+
 export function rarityTierFromPercentile(percentile: number): RarityTier {
   if (percentile < 1) {
     return RARITY_TIER.LEGENDARY
@@ -90,19 +98,13 @@ export function calculateCollectionRarity(tokens: CollectionTokenRow[]): RankedT
 
   const traitCounts = new Map<string, number>()
   for (const token of tokens) {
-    for (const attribute of token.attributes || []) {
-      const key = attributeKey(attribute)
-      if (!key) {
-        continue
-      }
+    for (const key of normalizedTraitKeys(token.attributes)) {
       traitCounts.set(key, (traitCounts.get(key) || 0) + 1)
     }
   }
 
   const scored = tokens.map((token) => {
-    const validTraits = (token.attributes || [])
-      .map(attributeKey)
-      .filter((key): key is string => key !== null)
+    const validTraits = normalizedTraitKeys(token.attributes)
 
     if (!validTraits.length) {
       return {

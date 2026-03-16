@@ -47,7 +47,11 @@ export async function handleMetadataSet(context: Context): Promise<void> {
     final.media = undefined
 
     await context.store.save(final)
-    await unlinkNftTokenHandler(context, final as NFTEntity)
+    try {
+      await unlinkNftTokenHandler(context, final as NFTEntity)
+    } catch (error) {
+      warn(OPERATION, `Failed to unlink token for ${final.id}: ${error}`)
+    }
     markCollectionRarityDirty(event.collectionId)
     markNftAttributesDirty(final.id)
     return

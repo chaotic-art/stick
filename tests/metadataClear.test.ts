@@ -154,4 +154,32 @@ describe('metadata clear handling', () => {
     expect(markNftAttributesDirtyMock).toHaveBeenCalledWith('2-9')
     expect(setMetadataHandlerMock).not.toHaveBeenCalled()
   })
+
+  it('still marks dirty state when unlink fails during metadata clear', async () => {
+    const nft = {
+      id: '3-7',
+      metadata: 'ipfs://meta',
+      meta: { id: 'meta-id' },
+      name: 'Broken Unlink NFT',
+      image: 'ipfs://image',
+      media: 'ipfs://media',
+    }
+
+    currentEvent.value = {
+      collectionId: '3',
+      sn: '7',
+      metadata: undefined,
+    }
+    getMock.mockResolvedValue(nft)
+    unlinkNftTokenHandlerMock.mockRejectedValueOnce(new Error('boom'))
+
+    const store = { save: vi.fn().mockResolvedValue(undefined) }
+
+    await handleUniquesMetadataSet({ store } as any)
+
+    expect(store.save).toHaveBeenCalledWith(nft)
+    expect(markCollectionRarityDirtyMock).toHaveBeenCalledWith('3')
+    expect(markNftAttributesDirtyMock).toHaveBeenCalledWith('3-7')
+    expect(warnMock).toHaveBeenCalledWith('METADATA', 'Failed to unlink token for 3-7: Error: boom')
+  })
 })

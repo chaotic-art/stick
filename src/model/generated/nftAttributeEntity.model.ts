@@ -1,4 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "@subsquid/typeorm-store"
+import {AttributeEntity} from "./attributeEntity.model"
 import {NFTEntity} from "./nftEntity.model"
 
 @Entity_()
@@ -15,10 +16,6 @@ export class NftAttributeEntity {
     nft!: NFTEntity
 
     @Index_()
-    @StringColumn_({nullable: false})
-    key!: string
-
-    @Index_()
-    @StringColumn_({nullable: false})
-    value!: string
+    @ManyToOne_(() => AttributeEntity, {nullable: true})
+    attribute!: AttributeEntity
 }

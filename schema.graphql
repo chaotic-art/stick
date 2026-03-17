@@ -91,14 +91,20 @@ type NFTEntity @entity {
   token: TokenEntity
 }
 
+# Entity to store a canonical normalized key/value attribute shared across NFTs
+type AttributeEntity @entity {
+  id: ID!
+  key: String! @index
+  value: String! @index
+  nftAttributes: [NftAttributeEntity!]! @derivedFrom(field: "attribute")
+}
+
 # Entity to store a normalized key/value attribute for an NFT
-# used for indexed trait lookups, filtering, and rarity calculations
-# each row belongs to a single NFTEntity via the nft relation
+# used as the join between an NFT and a canonical normalized attribute
 type NftAttributeEntity @entity {
   id: ID!
   nft: NFTEntity!
-  key: String! @index
-  value: String! @index
+  attribute: AttributeEntity!
 }
 
 # Entity to represent a Metadata

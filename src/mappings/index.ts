@@ -11,6 +11,7 @@ import { BatchContext, Block, Context, SelectedEvent } from './utils/types'
 import { ParachainSystemCall } from '../processable'
 import { updateSwapsCache } from './utils/cache'
 import { flushDirtyCollectionRarity, flushMissingCollectionRarity } from './utils/rarity'
+import { flushDirtyNftAttributes, flushMissingNftAttributes } from './utils/nftAttributes'
 
 type HandlerFunction = <T extends SelectedEvent>(item: T, ctx: Context) => Promise<void>
 
@@ -251,7 +252,9 @@ export async function mainFrame(ctx: BatchContext<Store>): Promise<void> {
   }
 
   await flushDirtyCollectionRarity(ctx.store)
+  await flushDirtyNftAttributes(ctx.store)
   await flushMissingCollectionRarity(ctx.store)
+  await flushMissingNftAttributes(ctx.store)
 
   if (ctx.isHead) {
     const lastBlock = ctx.blocks[ctx.blocks.length - 1]

@@ -6,10 +6,11 @@ import { CollectionEntity, NFTEntity } from '../../model'
 import { handleMetadata } from '../shared/metadata'
 import { debug, warn } from '../utils/logger'
 import { updateItemMetadataByCollection } from '../utils/cache'
-import { setMetadataHandler } from '../shared/token'
+import { setMetadataHandler, unlinkNftTokenHandler } from '../shared/token'
 import { tokenIdOf } from './types'
 import { getMetadataEvent } from './getters'
 import { markCollectionRarityDirty } from '../utils/rarity'
+import { markNftAttributesDirty } from '../utils/nftAttributes'
 
 const OPERATION = 'METADATA' as any
 
@@ -22,7 +23,7 @@ export async function handleMetadataSet(context: Context): Promise<void> {
   const event = unwrap(context, getMetadataEvent)
   debug(OPERATION, event)
 
-  if (!event.metadata) {
+  if (!event.metadata && !isNFT(event)) {
     return
   }
 
@@ -37,7 +38,26 @@ export async function handleMetadataSet(context: Context): Promise<void> {
     return
   }
 
-  if (!isFetchable(event.metadata)) {
+  if (!event.metadata && eventIsOnNFT) {
+    // Clear derived NFT fields and unlink stale token grouping when metadata is removed.
+    final.metadata = undefined
+    final.meta = undefined
+    final.name = undefined
+    final.image = undefined
+    final.media = undefined
+
+    await context.store.save(final)
+    try {
+      await unlinkNftTokenHandler(context, final as NFTEntity)
+    } catch (error) {
+      warn(OPERATION, `Failed to unlink token for ${final.id}: ${error}`)
+    }
+    markCollectionRarityDirty(event.collectionId)
+    markNftAttributesDirty(final.id)
+    return
+  }
+
+  if (!isFetchable(event.metadata!)) {
     warn(OPERATION, `NOT FETCHABLE ${event.collectionId}-${event.sn} ${event.metadata}`)
     return
   }
@@ -55,6 +75,7 @@ export async function handleMetadataSet(context: Context): Promise<void> {
 
     if (eventIsOnNFT) {
       markCollectionRarityDirty(event.collectionId)
+      markNftAttributesDirty(final.id)
 
       const collection = await getOptional<CollectionEntity>(context.store, CollectionEntity, event.collectionId)
 

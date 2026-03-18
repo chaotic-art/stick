@@ -9,20 +9,10 @@ import { debug, warn } from '../../utils/logger'
 import { generateTokenId, OPERATION } from './utils'
 import { TokenAPI } from './tokenAPI'
 
-export async function setMetadataHandler(
+export async function unlinkNftTokenHandler(
   context: Context,
-  collection: CE,
   nft: NE,
-): Promise<TE | undefined> {
-  debug(OPERATION, {
-    handleMetadataSet: `Handle set metadata for NFT ${nft.id}`,
-  })
-
-  const tokenId = generateTokenId(collection.id, nft)
-  if (!tokenId) {
-    return
-  }
-
+): Promise<void> {
   const tokenAPI = new TokenAPI(context.store)
 
   try {
@@ -34,9 +24,31 @@ export async function setMetadataHandler(
     }
   } catch (error) {
     warn(OPERATION, `ERROR ${error}`)
+    throw error
+  }
+}
+
+export async function setMetadataHandler(
+  context: Context,
+  collection: CE,
+  nft: NE,
+): Promise<TE | undefined> {
+  debug(OPERATION, {
+    handleMetadataSet: `Handle set metadata for NFT ${nft.id}`,
+  })
+
+  try {
+    await unlinkNftTokenHandler(context, nft)
+  } catch (error) {
     return
   }
 
+  const tokenId = generateTokenId(collection.id, nft)
+  if (!tokenId) {
+    return
+  }
+
+  const tokenAPI = new TokenAPI(context.store)
   const existingToken = await getOptional<TE>(context.store, TE, tokenId)
   return await (existingToken
     ? tokenAPI.addNftToToken(nft, existingToken)

@@ -21,7 +21,6 @@ type NftIdRow = {
 
 type NormalizedAttributeRow = {
   id: string
-  attributeId: string
   nftId: string
   key: string
   value: string
@@ -78,13 +77,11 @@ export function buildNormalizedAttributes(nftId: string, attributes?: AttributeL
       continue
     }
 
-    const attributeId = `${md5(normalized.key)}:${md5(normalized.value)}`
-    const id = `${nftId}:${attributeId}`
+    const id = `${nftId}:${md5(normalized.key)}:${md5(normalized.value)}`
     deduped.set(
       dedupeKey,
       {
         id,
-        attributeId,
         nftId,
         key: normalized.key,
         value: normalized.value,
@@ -126,71 +123,29 @@ export async function syncNftAttributes(store: Store, nftId: string): Promise<vo
   const attributes = effectiveAttributes(nft.itemAttributes, nft.metadataAttributes)
   const normalized = buildNormalizedAttributes(nftId, attributes)
 
-  const previousRows = await emOf(store).query(
-    `SELECT attribute_id AS "attributeId" FROM nft_attribute_entity WHERE nft_id = $1`,
-    [nftId],
-  ) as Array<{ attributeId: string }>
-  const previousAttributeIds = previousRows.map(({ attributeId }) => String(attributeId))
-
   await emOf(store).query(`DELETE FROM nft_attribute_entity WHERE nft_id = $1`, [nftId])
 
   if (normalized.length > 0) {
-    const attributeValues = normalized
-      .map((_, index) => {
-        const base = index * 3
-        return `($${base + 1}::text, $${base + 2}::text, $${base + 3}::text)`
-      })
-      .join(', ')
-
-    const attributeParams = normalized.flatMap(attribute => [
-      attribute.attributeId,
-      attribute.key,
-      attribute.value,
-    ])
-
-    await emOf(store).query(
-      `
-        INSERT INTO attribute_entity (id, key, value)
-        VALUES ${attributeValues}
-        ON CONFLICT (id) DO NOTHING
-      `,
-      attributeParams,
-    )
-
     const values = normalized
       .map((_, index) => {
-        const base = index * 3
-        return `($${base + 1}::text, $${base + 2}::text, $${base + 3}::text)`
+        const base = index * 4
+        return `($${base + 1}::text, $${base + 2}::text, $${base + 3}::text, $${base + 4}::text)`
       })
       .join(', ')
 
     const params = normalized.flatMap(attribute => [
       attribute.id,
-      attribute.attributeId,
+      attribute.key,
+      attribute.value,
       attribute.nftId,
     ])
 
     await emOf(store).query(
       `
-        INSERT INTO nft_attribute_entity (id, attribute_id, nft_id)
+        INSERT INTO nft_attribute_entity (id, key, value, nft_id)
         VALUES ${values}
       `,
       params,
-    )
-  }
-
-  if (previousAttributeIds.length > 0) {
-    await emOf(store).query(
-      `
-        DELETE FROM attribute_entity AS ae
-        WHERE ae.id = ANY($1::text[])
-          AND NOT EXISTS (
-            SELECT 1
-            FROM nft_attribute_entity AS nae
-            WHERE nae.attribute_id = ae.id
-          )
-      `,
-      [previousAttributeIds],
     )
   }
 }

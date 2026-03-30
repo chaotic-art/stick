@@ -5,16 +5,24 @@ import { TypeormDatabase as Database } from '@subsquid/typeorm-store'
 import logger from './mappings/utils/logger'
 import { Asset, NewNonFungible, NonFungible, NonFungibleCall, ParachainSystemCall, Unique } from './processable'
 
-import { CHAIN, getArchiveUrl, getNodeUrl, UNIQUES_ENABLED } from './environment'
+import {
+  CHAIN,
+  getArchiveUrl,
+  getNodeUrl,
+  REVIVE_ENABLED,
+  REVIVE_EVM_RPC_URL,
+  REVIVE_REGISTRY_ADDRESS,
+  REVIVE_START_BLOCK,
+  STARTING_BLOCK,
+  UNIQUES_ENABLED,
+} from './environment'
 import { mainFrame } from './mappings'
+import { ERC721_TRANSFER_TOPIC } from './mappings/revive/abi/erc721'
+import { COLLECTION_REGISTERED_TOPIC } from './mappings/revive/abi/registry'
 import { SelectedFields, fieldSelection } from './mappings/utils/types'
 
 const database = new Database({ supportHotBlocks: false })
 const processor = new SubstrateProcessor<SelectedFields>()
-
-const UNIQUE_STARTING_BLOCK = 323_750 // 618838;
-const _NFT_STARTING_BLOCK = 4_556_552
-const STARTING_BLOCK = UNIQUE_STARTING_BLOCK
 const ONLY_ARCHIVE = false
 
 // In case you need custom types
@@ -105,6 +113,27 @@ processor.setFields(fieldSelection)
 // processor.addEvent({ name: [Asset.forceCreate], call: true, extrinsic: true })
 processor.addEvent({ name: [Asset.setMetadata], call: true, extrinsic: true })
 // processor.addEvent({ name: [Asset.clearMetadata], call: true, extrinsic: true })
+
+if (REVIVE_ENABLED) {
+  if (!REVIVE_REGISTRY_ADDRESS) {
+    throw new Error('REVIVE_REGISTRY_ADDRESS is required when REVIVE_ENABLED=true')
+  }
+
+  if (!REVIVE_EVM_RPC_URL) {
+    throw new Error('REVIVE_EVM_RPC_URL is required when REVIVE_ENABLED=true')
+  }
+
+  processor.addReviveContractEmitted({
+    contract: [REVIVE_REGISTRY_ADDRESS],
+    topic0: [COLLECTION_REGISTERED_TOPIC],
+    range: { from: REVIVE_START_BLOCK },
+  })
+
+  processor.addReviveContractEmitted({
+    topic0: [ERC721_TRANSFER_TOPIC],
+    range: { from: REVIVE_START_BLOCK },
+  })
+}
 
 logger.info(`PROCESSING ~~ ${CHAIN.toUpperCase()} ~~ EVENTS`)
 

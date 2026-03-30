@@ -1,0 +1,44 @@
+manifestVersion: subsquid.io/v0.1
+name: snack
+version: 1
+description: 'SubSquid indexer for Uniques, Nfts and Revive ERC721 on AssetHub Paseo'
+build:
+deploy:
+  addons:
+    postgres:
+      config:
+        statement_timeout: 30000
+        log_min_duration_statement: 5000
+  processor:
+    cmd:
+      - node
+      - lib/processor
+    env:
+      CHAIN: paseo
+      OFFER: '174'
+      UNIQUES_ENABLED: false
+      STARTING_BLOCK: 5650083
+      NODE_URL: 'wss://asset-hub-paseo-rpc.n.dwellir.com'
+      REVIVE_ENABLED: true
+      REVIVE_REGISTRY_ADDRESS: '0x15d57d3ec0291715dF00B14b30270050dB28a1BA'
+      REVIVE_EVM_RPC_URL: 'https://eth-rpc-testnet.polkadot.io'
+      REVIVE_START_BLOCK: 5649754
+  api:
+    cmd:
+      - npx
+      - squid-graphql-server
+      - '--subscriptions'
+      - '--dumb-cache'
+      - in-memory
+      - '--dumb-cache-ttl'
+      - '1000'
+      - '--dumb-cache-size'
+      - '100'
+      - '--dumb-cache-max-age'
+      - '1000'
+
+scale:
+  dedicated: false
+  addons:
+    postgres:
+      profile: small

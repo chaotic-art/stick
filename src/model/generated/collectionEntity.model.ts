@@ -5,6 +5,7 @@ import {CollectionEvent} from "./collectionEvent.model"
 import {Kind} from "./_kind"
 import {MetadataEntity} from "./metadataEntity.model"
 import {NFTEntity} from "./nftEntity.model"
+import {CollectionKind} from "./_collectionKind"
 import {CollectionType} from "./_collectionType"
 import {CollectionSettings} from "./_collectionSettings"
 
@@ -111,6 +112,10 @@ export class CollectionEntity {
     @Index_()
     @BigIntColumn_({nullable: false})
     volume!: bigint
+
+    @Index_()
+    @Column_("varchar", {length: 7, nullable: false})
+    collectionType!: CollectionKind
 
     @Column_("varchar", {length: 8, nullable: true})
     type!: CollectionType | undefined | null

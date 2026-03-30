@@ -2,11 +2,11 @@ import { emOf } from '@kodadot1/metasquid/entity'
 import { ArchiveCallWithOptionalValue, Optional, Store } from '@kodadot1/metasquid/types'
 import * as ss58 from '@subsquid/ss58'
 import { decodeHex } from '@subsquid/substrate-processor'
-import { CHAIN } from '../../environment'
+import { SS58_PREFIX } from '../../environment'
 import { Context, SomethingWithOptionalMeta } from './types'
 
 
-const codec = CHAIN
+const codec = SS58_PREFIX
 
 export const UNIQUE_PREFIX = 'u' as const
 export const EMPTY = '' as const

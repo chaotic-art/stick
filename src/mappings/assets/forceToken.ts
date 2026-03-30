@@ -26,10 +26,10 @@ const systemAsset: Record<Chain, Asset> =
     symbol: 'DOT',
     decimals: 10,
   },
-  rococo: {
-    name: 'Rococo',
-    symbol: 'ROC',
-    decimals: 12,
+  paseo: {
+    name: 'Paseo',
+    symbol: 'PAS',
+    decimals: 10,
   },
 }
 

@@ -118,6 +118,13 @@ export enum ParachainSystemCall {
 }
 
 /**
+ * Revive pallet events
+ */
+export enum Revive {
+  contractEmitted = 'Revive.ContractEmitted',
+}
+
+/**
  * Assets Pallet Events
  * @enum {string}
  * @readonly

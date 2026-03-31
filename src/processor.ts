@@ -17,7 +17,7 @@ import {
   UNIQUES_ENABLED,
 } from './environment'
 import { mainFrame } from './mappings'
-import { ERC721_TRANSFER_TOPIC } from './mappings/revive/abi/erc721'
+import { CONTRACT_URI_UPDATED_TOPIC, ERC721_TRANSFER_TOPIC } from './mappings/revive/abi/erc721'
 import { COLLECTION_REGISTERED_TOPIC } from './mappings/revive/abi/registry'
 import { SelectedFields, fieldSelection } from './mappings/utils/types'
 
@@ -131,6 +131,11 @@ if (REVIVE_ENABLED) {
 
   processor.addReviveContractEmitted({
     topic0: [ERC721_TRANSFER_TOPIC],
+    range: { from: REVIVE_START_BLOCK },
+  })
+
+  processor.addReviveContractEmitted({
+    topic0: [CONTRACT_URI_UPDATED_TOPIC],
     range: { from: REVIVE_START_BLOCK },
   })
 }

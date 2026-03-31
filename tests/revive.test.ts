@@ -3,6 +3,7 @@ import { encodeAbiParameters, encodeEventTopics } from 'viem'
 import {
   collectionIdFromAddress,
   decodeCollectionRegisteredEvent,
+  decodeContractUriUpdatedEvent,
   decodeTransferEvent,
   isBurnTransfer,
   isMintTransfer,
@@ -79,5 +80,32 @@ describe('Revive helpers', () => {
     expect(decoded.from).toBe('0x0000000000000000000000000000000000000000')
     expect(decoded.to).toBe('0x3333333333333333333333333333333333333333')
     expect(decoded.tokenId).toBe(9n)
+  })
+
+  it('decodes contract metadata update events', () => {
+    const topics = encodeEventTopics({
+      abi: erc721Abi,
+      eventName: 'ContractURIUpdated',
+    })
+    const data = encodeAbiParameters(
+      [
+        { type: 'string', name: 'prevURI' },
+        { type: 'string', name: 'newURI' },
+      ],
+      [
+        'ipfs://old/metadata.json',
+        'ipfs://new/metadata.json',
+      ],
+    )
+
+    const decoded = decodeContractUriUpdatedEvent({
+      contract: '0x1568927Db173E22CA65643E1e7CaC114D9b39F4e',
+      data,
+      topics,
+    })
+
+    expect(decoded.contractAddress).toBe('0x1568927db173e22ca65643e1e7cac114d9b39f4e')
+    expect(decoded.prevUri).toBe('ipfs://old/metadata.json')
+    expect(decoded.newUri).toBe('ipfs://new/metadata.json')
   })
 })

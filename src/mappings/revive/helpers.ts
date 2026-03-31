@@ -23,6 +23,12 @@ export type DecodedTransferEvent = {
   tokenId: bigint
 }
 
+export type DecodedContractUriUpdatedEvent = {
+  contractAddress: string
+  prevUri: string
+  newUri: string
+}
+
 export function normalizeEvmAddress(address: string): string {
   try {
     return getAddress(address).toLowerCase()
@@ -93,6 +99,23 @@ export function decodeTransferEvent(args: unknown): DecodedTransferEvent {
     from: normalizeEvmAddress(String(eventArgs.from)),
     to: normalizeEvmAddress(String(eventArgs.to)),
     tokenId: BigInt(eventArgs.tokenId as bigint | number | string),
+  }
+}
+
+export function decodeContractUriUpdatedEvent(args: unknown): DecodedContractUriUpdatedEvent {
+  const payload = getReviveLogPayload(args)
+  const decoded = decodeEventLog({
+    abi: erc721Abi,
+    data: payload.data || '0x',
+    topics: payload.topics as [Hex, ...Hex[]],
+    strict: false,
+  })
+
+  const eventArgs = decoded.args as Record<string, unknown>
+  return {
+    contractAddress: payload.contract,
+    prevUri: String(eventArgs.prevURI || ''),
+    newUri: String(eventArgs.newURI || ''),
   }
 }
 

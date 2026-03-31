@@ -32,7 +32,7 @@ export function normalizeEvmAddress(address: string): string {
 }
 
 export function collectionIdFromAddress(address: string): string {
-  return `erc721-${normalizeEvmAddress(address)}`
+  return normalizeEvmAddress(address)
 }
 
 export function nftIdFromParts(collectionAddress: string, tokenId: string | bigint): string {

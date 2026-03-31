@@ -16,8 +16,8 @@ describe('Revive helpers', () => {
   it('normalizes and namespaces collection ids', () => {
     const address = '0x15D57D3Ec0291715dF00B14b30270050dB28a1BA'
     expect(normalizeEvmAddress(address)).toBe('0x15d57d3ec0291715df00b14b30270050db28a1ba')
-    expect(collectionIdFromAddress(address)).toBe('erc721-0x15d57d3ec0291715df00b14b30270050db28a1ba')
-    expect(nftIdFromParts(address, 42n)).toBe('erc721-0x15d57d3ec0291715df00b14b30270050db28a1ba-42')
+    expect(collectionIdFromAddress(address)).toBe('0x15d57d3ec0291715df00b14b30270050db28a1ba')
+    expect(nftIdFromParts(address, 42n)).toBe('0x15d57d3ec0291715df00b14b30270050db28a1ba-42')
   })
 
   it('classifies mint and burn transfers', () => {

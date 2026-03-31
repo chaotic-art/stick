@@ -83,12 +83,12 @@ describe('revive handlers', () => {
     expect(getWithMock).not.toHaveBeenCalled()
     expect(warnMock).toHaveBeenCalledWith(
       'SEND',
-      'Unknown collection erc721-0x329aaa5b6bea94e750b2dacba74bf41291e6c2bd',
+      'Unknown collection 0x329aaa5b6bea94e750b2dacba74bf41291e6c2bd',
     )
   })
 
   it('skips transfers when the nft was never indexed', async () => {
-    getOptionalMock.mockResolvedValue({ id: 'erc721-0x626b850c1173b7678458c190ca524a71d4fd84d5' })
+    getOptionalMock.mockResolvedValue({ id: '0x626b850c1173b7678458c190ca524a71d4fd84d5' })
     getWithMock.mockRejectedValue(new Error('missing nft'))
 
     await handleTokenTransfer(context, {
@@ -100,13 +100,13 @@ describe('revive handlers', () => {
 
     expect(warnMock).toHaveBeenCalledWith(
       'SEND',
-      'Unknown NFT erc721-0x626b850c1173b7678458c190ca524a71d4fd84d5-10000000000000000000',
+      'Unknown NFT 0x626b850c1173b7678458c190ca524a71d4fd84d5-10000000000000000000',
     )
     expect(createEventMock).not.toHaveBeenCalled()
   })
 
   it('skips burns when the nft was never indexed', async () => {
-    getOptionalMock.mockResolvedValue({ id: 'erc721-0x626b850c1173b7678458c190ca524a71d4fd84d5' })
+    getOptionalMock.mockResolvedValue({ id: '0x626b850c1173b7678458c190ca524a71d4fd84d5' })
     getWithMock.mockRejectedValue(new Error('missing nft'))
 
     await handleTokenBurn(context, {
@@ -118,7 +118,7 @@ describe('revive handlers', () => {
 
     expect(warnMock).toHaveBeenCalledWith(
       'BURN',
-      'Unknown NFT erc721-0x626b850c1173b7678458c190ca524a71d4fd84d5-10000000000000000000',
+      'Unknown NFT 0x626b850c1173b7678458c190ca524a71d4fd84d5-10000000000000000000',
     )
     expect(createEventMock).not.toHaveBeenCalled()
   })

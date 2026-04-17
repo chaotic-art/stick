@@ -73,6 +73,13 @@ export function unHex<T>(value: T): T | string {
 }
 
 /**
+ * Remove NUL characters that Postgres cannot store in text/json values.
+ */
+export function sanitizeText(value: unknown): string {
+  return String(value ?? '').replace(/\u0000/g, '')
+}
+
+/**
  * create a token uri from the base uri and the token id
  * @param baseUri - base uri from the collection
  * @param tokenId - the token id

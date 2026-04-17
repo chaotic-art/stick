@@ -226,8 +226,7 @@ function getRelayParentNumber(block: Block): number | undefined {
 **/
 export async function mainFrame(ctx: BatchContext<Store>): Promise<void> {
   const firstBlock = ctx.blocks[0].header.height
-  const lastBlockInBatch = ctx.blocks[ctx.blocks.length - 1].header.height
-  if (!assetsForced && STARTING_BLOCK <= firstBlock && _NFT_STARTING_BLOCK <= lastBlockInBatch) {
+  if (!assetsForced && STARTING_BLOCK <= firstBlock) {
     await forceAssets(ctx)
     assetsForced = true
   }

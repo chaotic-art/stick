@@ -62,6 +62,9 @@ const context = {
     height: 5660587,
     timestamp: new Date('2026-03-31T10:48:16.000Z').getTime(),
   },
+  event: {
+    name: 'Revive.ContractEmitted',
+  },
   store: {},
 } as any
 
@@ -103,6 +106,54 @@ describe('revive handlers', () => {
       'Unknown NFT 0x626b850c1173b7678458c190ca524a71d4fd84d5-10000000000000000000',
     )
     expect(createEventMock).not.toHaveBeenCalled()
+  })
+
+  it('records the previous owner on successful transfers', async () => {
+    const save = vi.fn().mockResolvedValue(undefined)
+    const entity = {
+      id: '0x626b850c1173b7678458c190ca524a71d4fd84d5-1',
+      currentOwner: '0x1111111111111111111111111111111111111111',
+      metadata: 'ipfs://token.json',
+      updatedAt: null,
+      collection: {
+        id: '0x626b850c1173b7678458c190ca524a71d4fd84d5',
+        ownerCount: 0,
+        distribution: 0,
+        updatedAt: null,
+      },
+    }
+
+    getOptionalMock.mockResolvedValue({ id: entity.collection.id })
+    getWithMock.mockResolvedValue(entity)
+    calculateCollectionOwnerCountAndDistributionMock.mockResolvedValue({
+      ownerCount: 3,
+      distribution: 2,
+    })
+
+    await handleTokenTransfer(
+      {
+        ...context,
+        store: { save },
+      },
+      {
+        contractAddress: entity.collection.id,
+        from: '0x1111111111111111111111111111111111111111',
+        to: '0x2222222222222222222222222222222222222222',
+        tokenId: 1n,
+      },
+    )
+
+    expect(entity.currentOwner).toBe('0x2222222222222222222222222222222222222222')
+    expect(createEventMock).toHaveBeenCalledWith(
+      entity,
+      'SEND',
+      expect.objectContaining({
+        caller: '0x1111111111111111111111111111111111111111',
+      }),
+      'ipfs://token.json',
+      { save },
+      '0x1111111111111111111111111111111111111111',
+    )
   })
 
   it('skips burns when the nft was never indexed', async () => {

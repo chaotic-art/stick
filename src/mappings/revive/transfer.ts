@@ -55,7 +55,7 @@ export async function handleTokenTransfer(
     toReviveBaseCall(transfer.from, context),
     entity.metadata || '',
     context.store,
-    entity.currentOwner,
+    oldOwner,
   )
 
   success(OPERATION, id)

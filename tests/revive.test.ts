@@ -108,4 +108,14 @@ describe('Revive helpers', () => {
     expect(decoded.prevUri).toBe('ipfs://old/metadata.json')
     expect(decoded.newUri).toBe('ipfs://new/metadata.json')
   })
+
+  it('rejects revive payloads with empty topics', () => {
+    expect(() =>
+      decodeTransferEvent({
+        contract: '0x4444444444444444444444444444444444444444',
+        data: '0x',
+        topics: [],
+      }),
+    ).toThrow('Invalid Revive.ContractEmitted payload')
+  })
 })

@@ -121,7 +121,12 @@ export function decodeContractUriUpdatedEvent(args: unknown): DecodedContractUri
 
 function getReviveLogPayload(args: unknown): ReviveLogPayload {
   const payload = args as Partial<ReviveLogPayload>
-  if (!payload || typeof payload.contract !== 'string' || !Array.isArray(payload.topics)) {
+  if (
+    !payload ||
+    typeof payload.contract !== 'string' ||
+    !Array.isArray(payload.topics) ||
+    payload.topics.length === 0
+  ) {
     throw new Error('Invalid Revive.ContractEmitted payload')
   }
 

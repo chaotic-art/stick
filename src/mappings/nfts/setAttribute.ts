@@ -2,7 +2,7 @@ import { getOrFail as get } from '@kodadot1/metasquid/entity'
 import { CollectionEntity, NFTEntity } from '../../model'
 import { unwrap } from '../utils/extract'
 import { Context, isNFT } from '../utils/types'
-import { addressOf, isAddress, unHex } from '../utils/helper'
+import { addressOf, isAddress, sanitizeText, unHex } from '../utils/helper'
 import { getAttributeEvent } from './getters'
 import { attributeFrom, tokenIdOf } from './types'
 import { markCollectionRarityDirty } from '../utils/rarity'
@@ -16,6 +16,8 @@ import { markNftAttributesDirty } from '../utils/nftAttributes'
  **/
 export async function handleAttributeSet(context: Context): Promise<void> {
   const event = unwrap(context, getAttributeEvent)
+  const trait = sanitizeText(event.trait)
+  const value = event.value == null ? null : sanitizeText(unHex(event.value))
 
   const final =
     isNFT(event)
@@ -25,21 +27,19 @@ export async function handleAttributeSet(context: Context): Promise<void> {
     final.attributes = []
   }
 
-  if ('royalty' in final && event.trait === 'royalty') {
-    const value = unHex(event.value)
+  if ('royalty' in final && trait === 'royalty') {
     final.royalty = final.royalty || Number.parseFloat(value || '0')
   }
 
-  if ('baseUri' in final && event.trait === 'baseUri') {
-    const value = unHex(event.value)
+  if ('baseUri' in final && trait === 'baseUri') {
     final.baseUri = final.baseUri || value
   }
 
-  if ('recipient' in final && event.trait === 'recipient') {
+  if ('recipient' in final && trait === 'recipient') {
     try {
       final.recipient = final.recipient || addressOf(event.value as string)
     } catch (error) {
-      const human = unHex(event.value)
+      const human = value
       final.recipient = isAddress(human) ? human : ''
       if (final.recipient === '') {
         console.log(error)
@@ -47,14 +47,14 @@ export async function handleAttributeSet(context: Context): Promise<void> {
     }
   }
 
-  if (event.value === null) {
-    final.attributes = final.attributes?.filter((attr) => attr.trait !== event.trait)
+  if (value === null) {
+    final.attributes = final.attributes?.filter((attr) => attr.trait !== trait)
   } else {
-    const attribute = final.attributes?.find((attr) => attr.trait === event.trait)
+    const attribute = final.attributes?.find((attr) => attr.trait === trait)
     if (attribute) {
-      attribute.value = unHex(event.value) ?? String(event.value)
-    } else if (event.trait !== 'royalty' && event.trait !== 'recipient') {
-      const newAttribute = attributeFrom({ trait_type: event.trait, value: unHex(event.value) ?? String(event.value) })
+      attribute.value = value
+    } else if (trait !== 'royalty' && trait !== 'recipient') {
+      const newAttribute = attributeFrom({ trait_type: trait, value })
       final.attributes?.push(newAttribute)
     }
   }

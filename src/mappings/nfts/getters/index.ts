@@ -1,4 +1,4 @@
-import { CHAIN } from '../../../environment'
+import { GETTER_CHAIN } from '../../../environment'
 import { Context } from '../../utils/types'
 import {
   BurnTokenEvent,
@@ -20,7 +20,7 @@ import {
 } from '../types'
 
 // eslint-disable-next-line unicorn/prefer-module
-const proc = require(`./${CHAIN}`)
+const proc = require(`./${GETTER_CHAIN}`)
 
 export function getCreateCollectionEvent(_ctx: Context): CreateCollectionEvent {
   const ctx = _ctx.event

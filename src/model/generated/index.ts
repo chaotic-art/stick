@@ -1,6 +1,7 @@
 export * from "./collectionEntity.model"
 export * from "./_attribute"
 export * from "./_kind"
+export * from "./_collectionKind"
 export * from "./_collectionType"
 export * from "./_collectionSettings"
 export * from "./tokenEntity.model"

@@ -1,9 +1,9 @@
-import { CHAIN } from '../../../environment'
+import { GETTER_CHAIN } from '../../../environment'
 import { Context } from '../../utils/types'
 import { CreateAssetEvent, ForceCreateAssetEvent, SetMetadata } from '../types'
 
 // eslint-disable-next-line unicorn/prefer-module
-const proc = require(`./${CHAIN}`)
+const proc = require(`./${GETTER_CHAIN}`)
 
 export function getCreateAssetEvent(_ctx: Context): CreateAssetEvent {
   const ctx = _ctx.event

@@ -31,6 +31,7 @@ type CollectionEntity @entity {
   updatedAt: DateTime! @index
   version: Int!
   volume: BigInt! @index
+  collectionType: CollectionKind! @index
   type: CollectionType
   settings: CollectionSettings
 }
@@ -254,6 +255,13 @@ enum CollectionType {
   HolderOf
   Issuer
   Public
+}
+
+enum CollectionKind {
+  UNIQUES
+  NFTS
+  ERC721
+  ERC1155
 }
 
 enum Surcharge {

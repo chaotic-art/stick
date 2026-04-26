@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeAll, afterAll, test } from 'vitest'
-import { onlyValue, addressOf, unHex } from '../src/mappings/utils/helper'
+import { onlyValue, addressOf, sanitizeText, unHex } from '../src/mappings/utils/helper'
 
 describe('Helpers', () => {
   // let store: SquidStore;
@@ -51,6 +51,12 @@ describe('Helpers', () => {
       } catch (error) {
         expect(error.message).toMatch('The expression evaluated to a falsy value')
       }
+    })
+  })
+
+  describe('sanitizeText', () => {
+    it('removes nul bytes from text values', () => {
+      expect(sanitizeText('a\u0000b\u0000c')).toBe('abc')
     })
   })
 })

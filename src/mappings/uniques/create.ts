@@ -1,6 +1,6 @@
 import { getOrCreate } from '@kodadot1/metasquid/entity'
 import md5 from 'md5'
-import { CollectionEntity as CE, Kind } from '../../model'
+import { CollectionEntity as CE, CollectionKind, Kind } from '../../model'
 import { handleMetadata } from '../shared/metadata'
 import { unwrap } from '../utils/extract'
 import { debug, pending, success } from '../utils/logger'
@@ -41,6 +41,7 @@ export async function handleCollectionCreate(context: Context): Promise<void> {
   final.updatedAt = event.timestamp
   final.volume = BigInt(0)
   final.version = versionOf(context)
+  final.collectionType = CollectionKind.UNIQUES
 
   debug(OPERATION, { version: final.version })
 

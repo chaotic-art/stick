@@ -1,11 +1,12 @@
 import { logger } from '@kodadot1/metasquid/logger'
 
 import { Store } from '@subsquid/typeorm-store'
-import { STARTING_BLOCK } from '../environment'
+import { _NFT_STARTING_BLOCK, STARTING_BLOCK } from '../environment'
 import { NFTEntity as NE } from '../model'
 import { Asset, NonFungible, NonFungibleCall, NewNonFungible, Unique } from '../processable'
 import * as a from './assets'
 import * as n from './nfts'
+import { handleReviveEvent } from './revive'
 import * as u from './uniques'
 import { BatchContext, Block, Context, SelectedEvent } from './utils/types'
 import { ParachainSystemCall } from '../processable'
@@ -14,6 +15,7 @@ import { flushDirtyCollectionRarity, flushMissingCollectionRarity } from './util
 import { flushDirtyNftAttributes, flushMissingNftAttributes } from './utils/nftAttributes'
 
 type HandlerFunction = <T extends SelectedEvent>(item: T, ctx: Context) => Promise<void>
+let assetsForced = false
 
 /**
  * Main entry point for processing non-fungibles on unique pallet
@@ -182,6 +184,10 @@ export async function assets<T extends SelectedEvent>(item: T, ctx: Context): Pr
   }
 }
 
+export async function revive<T extends SelectedEvent>(_item: T, ctx: Context): Promise<void> {
+  await handleReviveEvent(ctx)
+}
+
 /**
  * Force create system and USDT assets
  * Only call this once, at the start of the processing
@@ -200,6 +206,7 @@ const globalHandler: Record<string, HandlerFunction> = {
   Uniques: uniques,
   Nfts: nfts,
   Assets: assets,
+  Revive: revive,
 }
 
 function getRelayParentNumber(block: Block): number | undefined {
@@ -218,9 +225,10 @@ function getRelayParentNumber(block: Block): number | undefined {
  * mainFrame is the main entry point for processing a batch of blocks
 **/
 export async function mainFrame(ctx: BatchContext<Store>): Promise<void> {
-  const start = ctx.blocks[0].header.height
-  if (STARTING_BLOCK === start) {
+  const firstBlock = ctx.blocks[0].header.height
+  if (!assetsForced && STARTING_BLOCK <= firstBlock) {
     await forceAssets(ctx)
+    assetsForced = true
   }
   
   logger.info(

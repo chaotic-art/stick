@@ -21,7 +21,7 @@ vi.mock('../src/mappings/utils/extract', () => ({
   unwrap: () => currentEvent.value,
 }))
 
-vi.mock('../src/mappings/nfts/getters', () => ({
+vi.mock('../src/mappings/uniques/getters', () => ({
   getAttributeEvent: vi.fn(),
 }))
 
@@ -48,40 +48,11 @@ vi.mock('../src/model', () => {
   }
 })
 
-import { handleAttributeSet } from '../src/mappings/nfts/setAttribute'
+import { handleAttributeSet } from '../src/mappings/uniques/setAttribute'
 
-describe('nfts attribute handling', () => {
+describe('uniques attribute handling', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-  })
-
-  it('sanitizes nul bytes before saving nft attributes', async () => {
-    const nft = {
-      id: '442-517438',
-      attributes: [],
-    }
-
-    currentEvent.value = {
-      collectionId: '442',
-      sn: '517438',
-      trait: 'bad\u0000trait',
-      value: '\u0000oops',
-    }
-    getMock.mockResolvedValue(nft)
-
-    const store = { save: vi.fn().mockResolvedValue(undefined) }
-
-    await handleAttributeSet({ store } as any)
-
-    expect(nft.attributes).toEqual([
-      expect.objectContaining({
-        trait: 'badtrait',
-        value: 'oops',
-      }),
-    ])
-    expect(store.save).toHaveBeenCalledWith(nft)
-    expect(markCollectionRarityDirtyMock).toHaveBeenCalledWith('442')
-    expect(markNftAttributesDirtyMock).toHaveBeenCalledWith('442-517438')
   })
 
   it('removes nft attributes when clear events omit value', async () => {

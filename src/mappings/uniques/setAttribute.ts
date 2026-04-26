@@ -16,6 +16,7 @@ import { markNftAttributesDirty } from '../utils/nftAttributes'
  **/
 export async function handleAttributeSet(context: Context): Promise<void> {
   const event = unwrap(context, getAttributeEvent)
+  const value = event.value == null ? null : unHex(event.value)
 
   const final =
     event.sn !== undefined
@@ -26,14 +27,14 @@ export async function handleAttributeSet(context: Context): Promise<void> {
     final.attributes = []
   }
 
-  if (event.value === null) {
+  if (value === null) {
     final.attributes = final.attributes?.filter((attr) => attr.trait !== event.trait)
   } else {
     const attribute = final.attributes?.find((attr) => attr.trait === event.trait)
     if (attribute) {
-      attribute.value = unHex(event.value) ?? String(event.value)
+      attribute.value = value
     } else {
-      const newAttribute = attributeFrom({ trait_type: event.trait, value: unHex(event.value) ?? String(event.value) })
+      const newAttribute = attributeFrom({ trait_type: event.trait, value })
       final.attributes?.push(newAttribute)
     }
   }

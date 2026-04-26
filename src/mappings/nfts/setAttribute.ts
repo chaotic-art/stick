@@ -17,7 +17,7 @@ import { markNftAttributesDirty } from '../utils/nftAttributes'
 export async function handleAttributeSet(context: Context): Promise<void> {
   const event = unwrap(context, getAttributeEvent)
   const trait = sanitizeText(event.trait)
-  const value = event.value === null ? null : sanitizeText(unHex(event.value) ?? String(event.value))
+  const value = event.value == null ? null : sanitizeText(unHex(event.value))
 
   const final =
     isNFT(event)

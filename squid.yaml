@@ -1,14 +1,16 @@
 manifestVersion: subsquid.io/v0.1
 name: stick
-version: 14
+version: 15
 description: 'SubSquid indexer for Uniques and Assets on Statemine'
 build: 
 deploy:
-  addons:
-    postgres:
-      config:
-        statement_timeout: 30000
-        log_min_duration_statement: 5000
+  # addons:
+  #   postgres:
+  #     config:
+  #       statement_timeout: 30000
+  #       log_min_duration_statement: 5000
+  secrets:
+    - KUSAMA
   processor:
     cmd:
       - node
@@ -33,9 +35,9 @@ deploy:
       - '--dumb-cache-max-age'
       - '1000'
 
-scale:
-  dedicated: true
-  addons:
-    postgres:
-      storage: 2G
-      profile: medium
+# scale:
+#   dedicated: true
+#   addons:
+#     postgres:
+#       storage: 2G
+#       profile: medium

@@ -9,8 +9,6 @@ deploy:
   #     config:
   #       statement_timeout: 30000
   #       log_min_duration_statement: 5000
-  secrets:
-    - KUSAMA
   processor:
     cmd:
       - node
@@ -21,6 +19,7 @@ deploy:
       UNIQUES_ENABLED: true
       RARITY_BACKFILL_ENABLED: true
       NFT_ATTRIBUTE_BACKFILL_ENABLED: true
+      DB_URL: "${{ secrets.KUSAMA }}"
   api:
     cmd:
       - npx
